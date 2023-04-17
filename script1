@@ -1,0 +1,38 @@
+#!/bin/bash
+if [ -n "$1" ]
+then
+	my=$(whoami)
+	exec 6<&0
+	cat1="$pwd"
+	cat2="$1"
+	flag=0
+	copy=0
+	no_copy=0
+	for var in $(ls $cat1)
+	do
+		for var1 in $(ls $cat2)
+		do
+			if [ $var = $var1 ]
+			then
+				flag=1
+			fi 
+		done
+		if [ $flag -eq 1 ]
+		then
+			exec 0<&6
+			read -p "Заменить или пропустить копирование $var?(y/n) " answer
+			case $answer in
+				y) cp -r $var $cat2;		copy=$(($copy+1));;
+				n) no_copy=$(($no_copy+1))
+			esac
+		else
+			cp -r $var $cat2
+			copy=$(($copy+1))
+		fi
+		flag=0
+	done
+	echo "Скопировано без замены $no_copy"
+	echo "Скопировано с заменой $copy"
+else
+	echo "Нет дириктории куда копировать. Привер записи ~/my/script/"
+fi
